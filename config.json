@@ -4,7 +4,7 @@
         "username": "具备离线下载权限的用户",
         "password": "密码"
     },
-    "cron": "*/10 * * * *",
+    "clock": 600,
 
     "rss_feeds": [
     {

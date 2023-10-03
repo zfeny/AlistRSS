@@ -3,7 +3,7 @@ import requests, time, json, feedparser, sqlite3, os
 # TG消息推送
 def tg_bot(message, bot_token, chat_id):
     api_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
-    params = {'chat_id': chat_id, 'text': message}
+    params = {'chat_id': chat_id, 'text': message, 'parse_mode': 'Markdown'}
     response = requests.post(api_url, params=params)
 
     if response.status_code == 200:
@@ -183,9 +183,9 @@ def get_auth_token(login_url, login_data):
         return None
 
 # 封装Alist Aria2 API
-def send_to_aria2(record_ids, rss_db, alist_config):
+def send_to_aria2(record_ids, rss_db_path, alist_config):
     # 获取下载链接和保存路径
-    records = get_TRurl_path(record_ids, rss_db)
+    records = get_TRurl_path(record_ids, rss_db_path)
     # 发送到Aria2
     domain = alist_config["domain"]
     if domain.endswith('/'):
@@ -228,7 +228,17 @@ if __name__ == "__main__":
     start_time = time.time() # 用于运行计时
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) # 用于生成时间戳
 
-    with open("config.json", "r", encoding='utf-8') as config_file:
+    # 文件路径
+    # current_directory = os.getcwd()
+    # relative_config_json_path = "../config.json"
+    # relative_rss_db_path = "../data/rss_data.db"
+    # config_json_path = os.path.join(current_directory, relative_config_json_path)
+    # rss_db_path = os.path.join(current_directory, relative_rss_db_path)
+
+    config_json_path = "config.json"
+    rss_db_path = "data/rss_data.db"
+
+    with open(config_json_path, "r", encoding='utf-8') as config_file:
         config_data = json.load(config_file)
         alist_config = config_data["alist_config"]
         rss_feeds = config_data["rss_feeds"]
@@ -237,15 +247,14 @@ if __name__ == "__main__":
 
     # 获取RSS更新
     new_entries = [] # 更新的RSS项序号
-    rss_db = "rss_data.db"
     for rss_feed in rss_feeds:
-        new_entry = rss_sub(rss_feed["url"], rss_feed["path"], rss_db)
+        new_entry = rss_sub(rss_feed["url"], rss_feed["path"], rss_db_path)
         for item in new_entry:
             new_entries.append(item)
     
     # 发送到Aria2
     if new_entries:
-        aria2_return = send_to_aria2(new_entries, rss_db, alist_config)
+        aria2_return = send_to_aria2(new_entries, rss_db_path, alist_config)
         rss_success = len(aria2_return["success_id"])
         rss_failed = len(aria2_return["failed_id"])
         rss_num = rss_success + rss_failed
@@ -254,21 +263,21 @@ if __name__ == "__main__":
         tg_ms = f'RSS订阅程序运行完毕，本次共拉取*{rss_num}*个RSS项。\n'
         if rss_failed > 0:
             tg_ms += f'其中有*{rss_failed}*个RSS项下载失败，请检查Aria2状态。\n'
-        tg_ms += "---\n"
+        tg_ms += "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n"
         for i in aria2_return["success_id"]:
-            get_DS_path_return = get_DS_path(i, rss_db)
+            get_DS_path_return = get_DS_path(i, rss_db_path)
             ms_title = get_DS_path_return[0][0]
             ms_url = alist_config["domain"]+get_DS_path_return[0][1]
             tg_ms += f'"[{ms_title}]({ms_url})\n"'
-        tg_ms += "---\n"
+        tg_ms += "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n"
         if rss_failed > 0:
             tg_ms += "*以下RSS项添加失败：*\n"
             for i in aria2_return["failed_id"]:
-                get_DS_link_return = get_DS_link(i, rss_db)
+                get_DS_link_return = get_DS_link(i, rss_db_path)
                 ms_title = get_DS_link_return[0][0]
                 ms_url = get_DS_link_return[0][1]
                 tg_ms += f"[{ms_title}]({ms_url})\n"
-        tg_ms += "---\n"
+            tg_ms += "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n"
 
         end_time = time.time() 
         run_time = end_time - start_time
