@@ -1,0 +1,19 @@
+{
+    "alist_config": {
+        "domain": "alist的地址",
+        "username": "具备离线下载权限的用户",
+        "password": "密码"
+    },
+    "cron": "*/10 * * * *",
+
+    "rss_feeds": [
+    {
+        "url": "https://mikanani.me/RSS/Bangumi?bangumiId=3139&subgroupid=370",
+        "name": "OjoutoBanken-kun",
+        "path": "根据设置里用户的基本路径来"
+    }
+    ],
+
+    "tg_bot_token": "Telegram Bot的Token",
+    "tg_chat_id": "Telegram Chat ID"
+}
