@@ -3,8 +3,6 @@
 
 ## 使用方法
 - 修改config.json文件
-- 运行main.py文件
-    `python main.py`
-- 运行cron.py文件设置定时器
-    `python cron.py`
+- 运行start.py文件
+    `python start.py`
 - Enjoy Yourself！
