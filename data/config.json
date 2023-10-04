@@ -1,0 +1,17 @@
+{
+    "alist_config": {
+        "domain": "alist的地址",
+        "login_data": {
+            "username": "具备离线下载权限的用户",
+            "password": "密码"
+        },
+        "auto_path": "自动归类下载的目录（可选）"
+    },
+    
+    "clock": 600,
+
+    "tg_bot_info":{
+        "token": "Telegram Bot的Token",
+        "chat_id": "Telegram Chat ID"
+    }
+}
